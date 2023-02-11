@@ -3,5 +3,5 @@ package model
 type Account struct {
 	ID       int
 	Fullname string
-	Balance  int
+	Balance  float32
 }
