@@ -17,6 +17,12 @@ func main() {
 	defer db.Close()
 
 	bankRepo := repository.NewBankRepo(db)
+
+	// run this first before run the transactionServices
+	accountServices := service.NewAccountService(bankRepo)
+	_ = accountServices.CreateAccount()
+	// finish run this
+
 	transactionServices := service.NewTransactionService(bankRepo)
 
 	err := transactionServices.GetAllAccounts()

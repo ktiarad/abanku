@@ -52,33 +52,81 @@ func (t *TransactionServices) MonthlyTransaction() (err error) {
 	// go t.TaxInterest(accounts)
 
 	for _, account := range *accounts {
-		err = t.AdminFee(&account)
+		accountChannel <- account
 
-		if err != nil {
-			log.Fatalf("error when AdminFee userID: %d", account.ID)
-		}
+		go t.AdminFee(accountChannel)
+		go t.Interest(accountChannel)
+		go t.TaxInterest(accountChannel)
 	}
 
-	for _, account := range *accounts {
-		err = t.Interest(&account)
+	// for _, accountChannelForInterest := range accountChannel {
+	// 	go t.Interest(accountChannelForInterest)
+	// }
 
-		if err != nil {
-			log.Fatalf("error when Interest userID: %d", account.ID)
-		}
-	}
+	// for _, account := range *accounts {
+	// 	err = t.AdminFee(&account)
 
-	for _, account := range *accounts {
-		err = t.TaxInterest(&account)
+	// 	if err != nil {
+	// 		log.Fatalf("error when AdminFee userID: %d", account.ID)
+	// 	}
+	// }
 
-		if err != nil {
-			log.Fatalf("error when TaxInterest userID: %d", account.ID)
-		}
-	}
+	// for _, account := range *accounts {
+	// 	err = t.Interest(&account)
+
+	// 	if err != nil {
+	// 		log.Fatalf("error when Interest userID: %d", account.ID)
+	// 	}
+	// }
+
+	// for _, account := range *accounts {
+	// 	err = t.TaxInterest(&account)
+
+	// 	if err != nil {
+	// 		log.Fatalf("error when TaxInterest userID: %d", account.ID)
+	// 	}
+	// }
 
 	return nil
 }
 
-func (t *TransactionServices) AdminFee(account *model.Account) (err error) {
+func (t *TransactionServices) AdminFee(accountChannel chan model.Account) (err error) {
+	account := <-accountChannel
+
+	if t.isBelowMinimumBalance(&account) {
+		return nil
+	}
+
+	account.Balance -= configs.ADMIN_FEE
+
+	return nil
+}
+
+func (t *TransactionServices) Interest(accountChannel chan model.Account) (err error) {
+	account := <-accountChannel
+
+	if t.isBelowMinimumBalance(&account) {
+		return nil
+	}
+
+	account.Balance = account.Balance + (account.Balance * configs.INTEREST_PERCENTAGE)
+
+	return nil
+}
+
+func (t *TransactionServices) TaxInterest(accountChannel chan model.Account) (err error) {
+	account := <-accountChannel
+
+	if t.isBelowMinimumBalance(&account) {
+		return nil
+	}
+
+	account.Balance = account.Balance - (account.Balance * configs.TAX_INTEREST_PERCENTAGE)
+
+	return nil
+}
+
+func (t *TransactionServices) AdminFeeV0(account *model.Account) (err error) {
 	if t.isBelowMinimumBalance(account) {
 		return nil
 	}
@@ -88,7 +136,7 @@ func (t *TransactionServices) AdminFee(account *model.Account) (err error) {
 	return nil
 }
 
-func (t *TransactionServices) Interest(account *model.Account) (err error) {
+func (t *TransactionServices) InterestV0(account *model.Account) (err error) {
 	if t.isBelowMinimumBalance(account) {
 		return nil
 	}
@@ -98,7 +146,7 @@ func (t *TransactionServices) Interest(account *model.Account) (err error) {
 	return nil
 }
 
-func (t *TransactionServices) TaxInterest(account *model.Account) (err error) {
+func (t *TransactionServices) TaxInterestV0(account *model.Account) (err error) {
 	if t.isBelowMinimumBalance(account) {
 		return nil
 	}

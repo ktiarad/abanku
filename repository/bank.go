@@ -8,6 +8,7 @@ import (
 type BankRepo interface {
 	GetAllAccounts() (response *[]model.Account, err error)
 	InsertTransaction(transaction *model.Transaction) (err error)
+	CreateAccount(account *model.Account) (err error)
 }
 
 type bankRepo struct {
@@ -41,11 +42,23 @@ func (b *bankRepo) GetAllAccounts() (response *[]model.Account, err error) {
 		accounts = append(accounts, model.Account{
 			ID:       id,
 			Fullname: fullname,
-			Balance:  int(balance),
+			Balance:  balance,
 		})
 	}
 
 	return &accounts, nil
+}
+
+func (b *bankRepo) CreateAccount(account *model.Account) (err error) {
+	query := `INSERT INTO accounts (balance)
+	VALUES ($1);`
+
+	_, err = b.db.Exec(query, account.Balance)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (b *bankRepo) InsertTransaction(transaction *model.Transaction) (err error) {
