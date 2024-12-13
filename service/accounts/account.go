@@ -1,4 +1,4 @@
-package service
+package accounts
 
 import (
 	"abanku/model"
@@ -7,11 +7,16 @@ import (
 	"math/rand"
 )
 
+type Account interface {
+	CreateAccount() error
+	GetAllAccounts() []model.Account
+}
+
 type AccountServices struct {
 	Bank repository.BankRepo
 }
 
-func NewAccountService(bank repository.BankRepo) *AccountServices {
+func NewAccountService(bank repository.BankRepo) *Account {
 	return &AccountServices{
 		Bank: bank,
 	}
@@ -33,4 +38,15 @@ func (a *AccountServices) CreateAccount() error {
 	}
 
 	return nil
+}
+
+func (a *AccountServices) GetAllAccounts() []model.Account {
+	var response *[]model.Account
+
+	response, err := a.Bank.GetAllAccounts()
+	if err != nil {
+		panic(err)
+	}
+
+	return *response
 }
