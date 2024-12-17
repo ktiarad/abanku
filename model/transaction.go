@@ -7,7 +7,7 @@ type Transaction struct {
 	AccountID       int
 	TransactionType string
 	Description     string
-	Amount          float32
-	EndingBalance   float32
+	Amount          float64
+	EndingBalance   float64
 	TransactionDate *time.Time
 }

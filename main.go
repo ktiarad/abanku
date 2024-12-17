@@ -2,6 +2,7 @@ package main
 
 import (
 	"abanku/configs"
+	"abanku/infra"
 	"abanku/model"
 	"abanku/repository"
 	"abanku/service"
@@ -12,9 +13,15 @@ import (
 func main() {
 	fmt.Println("Start ABanku")
 
-	db := configs.ConnectDB()
+	// init config
+	configs := configs.InitConfigs()
 
+	// init infra
+	db := infra.ConnectDB(&configs.DBConfig)
 	defer db.Close()
+
+	// init service
+	infra.NewRest()
 
 	bankRepo := repository.NewBankRepo(db)
 
