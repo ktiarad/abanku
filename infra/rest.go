@@ -2,6 +2,7 @@ package infra
 
 import (
 	"abanku/controller"
+	"abanku/service"
 	"net/http"
 	"time"
 
@@ -10,10 +11,12 @@ import (
 
 var ()
 
-func NewRest() {
+func NewRest(
+	services service.Services,
+) {
 	router := gin.Default()
 
-	controller.SetRoute(router)
+	controller.SetRoute(router, services)
 
 	server := &http.Server{
 		Addr:         ":8080",
