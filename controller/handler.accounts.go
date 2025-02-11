@@ -9,8 +9,6 @@ import (
 
 func (x ServiceImplementation) handleGetAccounts() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// var response []model.Account
-
 		response := x.GetAllAccounts()
 
 		jsonRes, err := json.Marshal(response)
