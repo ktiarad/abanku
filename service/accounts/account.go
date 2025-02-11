@@ -16,13 +16,13 @@ type AccountServices struct {
 	Bank repository.BankRepo
 }
 
-func NewAccountService(bank repository.BankRepo) *Account {
-	return &AccountServices{
+func NewAccountService(bank repository.BankRepo) Account {
+	return AccountServices{
 		Bank: bank,
 	}
 }
 
-func (a *AccountServices) CreateAccount() error {
+func (a AccountServices) CreateAccount() error {
 	var balance int
 	var err error
 
@@ -40,7 +40,7 @@ func (a *AccountServices) CreateAccount() error {
 	return nil
 }
 
-func (a *AccountServices) GetAllAccounts() []model.Account {
+func (a AccountServices) GetAllAccounts() []model.Account {
 	var response *[]model.Account
 
 	response, err := a.Bank.GetAllAccounts()
